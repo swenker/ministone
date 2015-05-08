@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <param name="Threshold" value="DEBUG"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS Z} %-5p [%t] %c#%M(%L) - %m%n"/>
+        </layout>
+    </appender>
+
+    <!--
+    	STDOUT and STDERR to file name formatted 'log4j.directory_service.log.yyyy-MM-dd'
+    -->
+
+    <appender name="CONTENT_FILE_LOCAL" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="Threshold" value="DEBUG"/>
+
+        <!-- New logfile every day -->
+        <param name="File" value="/home/jetty/logs/dbcheck.log"/>
+        <param name="DatePattern" value="'.'yyyy-MM-dd"/>
+
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS Z} %-5p [%t] %c#%M(%L) - %m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="ASYNC" class="org.apache.log4j.AsyncAppender">
+        <param name="BufferSize" value="10000"/>
+        <param name="LocationDEBUG" value="true"/>
+        <appender-ref ref="CONTENT_FILE_LOCAL"/>
+    </appender>
+
+    <logger name="org.apache.http">
+        <level value="WARN"/>
+    </logger>
+
+
+
+    <root>
+         <!--<appender-ref ref="CONSOLE"/>-->
+        <appender-ref ref="CONTENT_FILE_LOCAL"/>
+        <!-- <appender-ref ref="ASYNC"/>       -->
+    </root>
+
+
+</log4j:configuration>
