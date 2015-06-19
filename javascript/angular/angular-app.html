@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular.js"></script>
+<script src="C:\ZZZZZ\0-sunwj\studio\shijing_img\www\jslib\jquery\jquery-1.9.1.js"></script>
+
+<body>
+
+<div ng-app="MC"  ng-controller="rolecontroller">
+	
+	<select id="availableRoles" multiple  name="availableRoles"  >
+	    <option ng-repeat = "x in availableRoles | filter:x.enable=true" > {{x.name}}</option>
+
+	</select>
+
+<br><br>
+	<select id="grantedRoles" multiple="multiple" name="grantedRoles" ng-model="grantedRoles">
+	    <option ng-repeat = "x in availableRoles | filter:x.enable=false"  > {{x.name}}</option>
+	</select>
+   
+</div>
+
+ 
+<script>
+	
+console.log('aaa');
+var myapp = angular.module('MC',[]);
+
+myapp.controller('rolecontroller', function($scope){     
+	    $scope.availableRoles=[{name:'Admin',enable:'false'},{name:'Guest',enable:'true'},{name:'User',enable:'true'}];
+	  }
+);
+
+
+
+	$('#availableRoles').click(function(){ 
+	    var selectRole=this.selectedIndex;
+	    //alert(selectRole);
+
+		var scope = angular.element($("#availableRoles")).scope();
+		scope.$apply(function(){
+			scope.availableRoles[selectRole].enable=false;
+		});
+	});
+	
+	$('#grantedRoles').click(function(){ 
+	    var selectRole=this.selectedIndex;
+	    //alert(selectRole);
+
+		var scope = angular.element($("#availableRoles")).scope();
+		scope.$apply(function(){
+			scope.availableRoles[selectRole].enable=false;
+		});
+	});
+
+
+</script>
+
+</body>
+</html>
