@@ -1,0 +1,28 @@
+<html lang="en">
+    <head>
+	    <title>Angular Study</title>
+	</head
+	
+	<body>
+	    <div ng-app="myLearn1">
+		    
+			<div ng-controller="handleGreetingController"> 
+			
+			    <input type="text" name="user" ng-model="user">
+			    {{user + "--" +sayHello(user)}}
+			</div>
+			
+			<div ng-controller="handleSleepController"> 
+			
+			    <input type="text" name="username" ng-model="username">
+			    {{username + "--" +gowork()}}
+			</div>
+			
+		</div>
+	
+	<script src="../angular.js"></script>
+
+	<script src="../my_learn_1.js"></script>
+	</body>
+
+</html>
