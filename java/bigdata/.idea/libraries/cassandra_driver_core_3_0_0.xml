@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="cassandra-driver-core-3.0.0">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/datastax/cassandra/cassandra-driver-core/3.0.0/cassandra-driver-core-3.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
