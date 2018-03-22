@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+body { font: 12px Arial;}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: steelblue;
+}
+
+.x.axis path {
+  display: block;
+}
+
+.line {
+  fill: none;
+  stroke: #444;
+  stroke-width: 1.5px;
+}
+</style>
+<body>
+<script src="d3.v3.min.js"></script>
+<script>
+
+var margin = {top: 20, right: 20, bottom: 80, left: 40},
+    width = 1024 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x0 = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var x2 = d3.scale.ordinal();
+
+var y0 = d3.scale.linear()
+    .range([height, 0]);
+
+var color = d3.scale.ordinal().range(["#ff8c00", "#a05d56"]);
+
+dx=["2016-10-07","2016-10-08","2016-10-09","2016-10-10","2016-10-11","2016-10-12","2016-10-13","2016-10-14","2016-10-15","2016-10-16",
+   "2016-10-17","2016-10-18","2016-10-19","2016-10-20","2016-11-10","2016-11-11","2016-11-12","2016-11-13","2016-11-14","2016-11-15",
+   "2016-11-16","2016-11-17","2016-11-18","2016-11-19","2016-11-20"];
+data1=[350767,344186,346365,348561,349362,351831,353921,354588,348340,359756,353585,356392,358935,359636];
+data2=[201213,200742,201438,201756,202405,202808,202886,203074,202100,205046,203731,204355,205788,206218];
+
+var xAxis = d3.svg.axis()
+    .scale(x0)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y0)
+    .orient("left")
+    .tickFormat(d3.format(".2s"));
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.json("devices_all_unique.json", function(error, data) {
+  if (error) throw error;
+
+  var counterNames = d3.keys(data[0]).filter(function(key) { return key !== "date"; });
+
+  data.forEach(function(d) {
+    d.counters = counterNames.map(function(name) { return {name: name, value: +d[name]}; });
+  });
+
+  x0.domain(data.map(function(d) { return d.date; }));
+  //console.log(x0.domain());
+  //x1.domain(counterNames).rangeRoundBands([0, x0.rangeBand()]);
+  y0.domain([0, d3.max(data, function(d) { return d3.max(d.counters, function(d) { return d.value; }); })]);
+  //console.log(y0.domain());
+
+  svg.append("g")
+      .attr("class", "x axis")
+	  //.attr("transform", "rotate(-90)")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .selectAll("text")  
+      .style("text-anchor", "end")
+            //.attr("dx", "-.8em")
+            //.attr("dy", ".15em")
+      .attr("transform", "rotate(-65)" );	  
+	  ;
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Device Counter");
+
+  //What's the usage of this part?
+  var state = svg.selectAll(".state")
+      .data(function(d) { return d.counters; })
+      .enter().append("g")
+      .attr("class", "state")
+      .attr("transform", function(d) { return "translate(" + x0(d.date) + ",0)"; })
+	  ;
+
+/*
+  state.selectAll("rect")
+      .data(function(d) { return d.counters; })
+      .enter().append("rect")
+      .attr("width", x1.rangeBand())
+      .attr("x", function(d) { return x1(d.name); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); })
+      .style("fill", function(d) {
+       return color(d.name); });
+*/
+    var line1 = d3.svg.line()
+        .x(function(d,i) {
+		    //console.log(dx[i]);
+            //console.log('Plotting X1 value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x0(d.date) + ' using our xScale.');
+            // return the X coordinate where we want to plot this datapoint
+			//console.log(x0(i));
+            return x0(i);
+        })
+        .y(function(d) {
+            // verbose logging to show what's actually being done
+            //console.log('Plotting Y1 value for data point: ' + d + ' to be at: ' + y(d) + " using our y1Scale.");
+            // return the Y coordinate where we want to plot this datapoint
+            return y0(d);
+        })
+
+    // create a line function that can convert data[] into x and y points
+    var line2 = d3.svg.line()
+        .x(function(d,i) {
+            //console.log('Plotting X2 value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
+            // return the X coordinate where we want to plot this datapoint
+            return x0(i);
+        })
+        .y(function(d) {
+            // verbose logging to show what's actually being done
+            //console.log('Plotting Y2 value for data point: ' + d + ' to be at: ' + y2(d) + " using our y2Scale.");
+            // return the Y coordinate where we want to plot this datapoint
+            return y0(d);
+			})
+
+    // add lines
+    // do this AFTER the axes above so that the line is above the tick-lines
+    state.append("svg:path").attr("d", line1(data1)).attr("class", "data1");
+    state.append("svg:path").attr("d", line2(data2)).attr("class", "data2");
+
+  var legend = svg.selectAll(".legend")
+      .data(counterNames.slice().reverse())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legend.append("rect")
+      .attr("x", width - 1)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
+
+  legend.append("text")
+      .attr("x", width - 4)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+		
+});
+
+</script>
